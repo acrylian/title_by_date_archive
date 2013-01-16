@@ -156,14 +156,15 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
 							}
 						}
 						$albums = query($sql);
+						$hint = $show = NULL;
 						if($result2) {
 							while ($item = db_fetch_assoc($albums)) {
-								$obj = new ZenpageNews($item['titlelink']);
-								if ($obj->categoryIsVisible()) {
+								$obj = new Album($item['folder']);
+								if ($obj->checkAccess($hint, $show)) {
 									$result2[] = $obj;
 								}
 							}
-						db_free_result($result2);
+						db_free_result($sql);
 						}
 						break;
 					case 'news':
