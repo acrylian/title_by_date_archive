@@ -155,10 +155,10 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
 								$sql .=  ' AND `id` != '.$id;
 							}
 						}
-						$albums = query($sql);
+						$result = query($sql);
 						$hint = $show = NULL;
-						if($result2) {
-							while ($item = db_fetch_assoc($albums)) {
+						if($result) {
+							while ($item = db_fetch_assoc($result)) {
 								$obj = new Album($item['folder']);
 								if ($obj->checkAccess($hint, $show)) {
 									$result2[] = $obj;
@@ -169,9 +169,9 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
 						break;
 					case 'news':
 						$sql = "SELECT `titlelink`, `date` FROM ". prefix('news')." WHERE `show` = 1 AND `date` LIKE '".$month."%'";
-						$news = query($sql);
-						if($news) {
-							while ($item = db_fetch_assoc($news)) {
+						$result = query($sql);
+						if($result) {
+							while ($item = db_fetch_assoc($result)) {
 								$obj = new ZenpageNews($item['titlelink']);
 								if ($obj->categoryIsVisible()) {
 									$result2[] = $obj;
