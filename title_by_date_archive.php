@@ -1,3 +1,4 @@
+<?php
 /**
  * Simple plugin that provides a function to print an archive by title and month for albums and news articles. jQuery required for foldin/foldout.
  *
@@ -252,3 +253,4 @@ function getASTarticleCategories($obj) {
 	}
 	return $category;
 }
+?>
