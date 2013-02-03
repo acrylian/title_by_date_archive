@@ -49,6 +49,7 @@ class title_by_date_archive_options {
 				'order' => 2,
 				'desc' => gettext_pl('Check to list the owner of the album','title_by_date_archive'))
 	 );
+	 return $options;
 	}
 	
 }
@@ -59,9 +60,10 @@ class title_by_date_archive_options {
  * @param string $order 'desc' or 'asc' for descending or ascending order
  * @return array
  */
-function printASTtitleByDateArchive($type='albums',$order='asc') {
+function printTitleByDateArchive($type='albums',$order='asc') {
 	global $_zp_gallery, $_zp_zenpage;
-	if($type='news' && !getOption('zp_plugin_zenpage')) {
+
+	if($type == 'news' && !getOption('zp_plugin_zenpage')) {
 		echo '<p><strong>The Zenpage CMS plugin is required for this and not enabled!</strong></p>';
 		break;
 	}
@@ -77,8 +79,9 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
 					$sql .= ' AND `id` !='.$id.'';
 				}
 				//$sql = substr($sql, 0, -5);
-			}
+			} 
 			$result = query_full_array($sql);
+			
 			foreach($result as $row){
 				$alldates[] = $row['date'];
 			}
@@ -108,7 +111,7 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
 	} else {
 		asort($months);
 	}
-	//echo "<pre>"; print_r($months); echo "</pre>";
+	echo "<pre>"; print_r($months); echo "</pre>";
 	foreach($months as $date) {
 		$years[] = substr($date, 0, 4);
 	}
@@ -160,12 +163,12 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
 						$hint = $show = NULL;
 						if($result) {
 							while ($item = db_fetch_assoc($result)) {
-								$obj = new Album($item['folder']);
+								$obj = new Album(null,$item['folder']);
 								if ($obj->checkAccess($hint, $show)) {
 									$result2[] = $obj;
 								}
 							}
-						db_free_result($sql);
+						db_free_result($result);
 						}
 						break;
 					case 'news':
@@ -178,11 +181,11 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
 									$result2[] = $obj;
 								}
 							}
-							db_free_result($sql);
+							db_free_result($result);
 						}
 						break;
 				}
-			}
+			} 
 			if($result2) {
 				echo '<ul class="entries">'."\n";
 				$entrycount = count($result2);
@@ -193,34 +196,37 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
 					//if($count != $entrycount) {
 					//	$comma = ', ';
 					//}
+					$authorlink = '';
 					switch($type) {
 						case 'albums':
-							$obj = new Album($_zp_gallery,$entry['folder']);
-							$title = $obj->getTitle();
-							$date = zpFormattedDate(DATE_FORMAT, strtotime($obj->getDateTime()));
-							$link = $obj->getAlbumLink();
-							$authorlink = '';
-							$category = '';
+							$title = $entry->getTitle();
+							$date = zpFormattedDate(DATE_FORMAT, strtotime($entry->getDateTime()));
+							$link = $entry->getAlbumLink(); 
+							if(getOption('title_by_date_archive_showalbumowner')) {
+								$author = $entry->getOwner();
+								$authorfull = getTitleByDateAuthorFullname($author);
+							}
+							$category = ''; 
 							break;
 						case 'news':
 							// news are already objects here!
 							$title = $entry->getTitle();
 							$date = zpFormattedDate(DATE_FORMAT, strtotime($entry->getDateTime()));
 							$link = getNewsURL($entry->getTitleLink());
-							if(getOption('title_by_date_archive_showauthor')) {
+							if(getOption('title_by_date_archive_shownewsauthor')) {
 								$author = $entry->getAuthor();
-								$authorfull = getASTarticleAuthorFullname($entry);
-								$authorlink = ' '.gettext('by').'<a href="'.getPageLinkURL($author).'" title="'.html_encode($authorfull).'">'.html_encode($authorfull).'</a>';
-							} else {
-								$authorlink = '';
-							}
-							$category = ' – '.getASTarticleCategories($entry);
+								$authorfull = getTitleByDateAuthorFullname($author);
+							} 
+							$category = ' – '.getTitleByDateArticleCategories($entry);
 							break;
 					}
+					if(!is_null($authorfull)) {
+						$authorlink = ' – '.html_encode($authorfull);
+					}
 					echo '<li><a href="'.html_encode($link).'">'.html_encode($title).'</a> <em>('.$date.')</em> <span class="author">'.$category.$authorlink.$comma.'</span></li>'."\n";
-				}
+				} 
 				echo '</ul></li></ul>';
-			}
+			} 
 		}
 		echo '</li></ul>';
 	}
@@ -233,7 +239,7 @@ function printASTtitleByDateArchive($type='albums',$order='asc') {
  *
  * @param obj $obj news article object
  */
-function getASTarticleCategories($obj) {
+function getTitleByDateArticleCategories($obj) {
 	$category = '';
 	$separator = ', ';
 	$categories = $obj->getCategories();
@@ -252,5 +258,24 @@ function getASTarticleCategories($obj) {
 		$category = gettext('News');
 	}
 	return $category;
+}
+
+/**
+ * gets the article's or page's author's or album owner's full name
+ *
+ * @param string $author the author or owner
+ */
+function getTitleByDateAuthorFullname($author) {
+	global $_zp_authority;
+	if(empty($author)) return NULL;
+	$authorfull = $author;
+	$admin = $_zp_authority->getAnAdmin(array('`user`=' => $author, '`valid`=' => 1));
+	if (is_object($admin)) {
+		$authorfull = $admin->getName();
+		if(empty($authorfull)) {
+			$authorfull = $author;
+		}
+	}
+	return $authorfull;
 }
 ?>
