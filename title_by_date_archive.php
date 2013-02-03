@@ -81,7 +81,6 @@ function printTitleByDateArchive($type='albums',$order='asc') {
 				//$sql = substr($sql, 0, -5);
 			} 
 			$result = query_full_array($sql);
-			
 			foreach($result as $row){
 				$alldates[] = $row['date'];
 			}
@@ -111,7 +110,7 @@ function printTitleByDateArchive($type='albums',$order='asc') {
 	} else {
 		asort($months);
 	}
-	echo "<pre>"; print_r($months); echo "</pre>";
+	//echo "<pre>"; print_r($months); echo "</pre>";
 	foreach($months as $date) {
 		$years[] = substr($date, 0, 4);
 	}
@@ -197,6 +196,7 @@ function printTitleByDateArchive($type='albums',$order='asc') {
 					//	$comma = ', ';
 					//}
 					$authorlink = '';
+					$authorfull = NULL;
 					switch($type) {
 						case 'albums':
 							$title = $entry->getTitle();
@@ -220,9 +220,9 @@ function printTitleByDateArchive($type='albums',$order='asc') {
 							$category = ' – '.getTitleByDateArticleCategories($entry);
 							break;
 					}
-					if(!is_null($authorfull)) {
+					if(!empty($authorfull)) {
 						$authorlink = ' – '.html_encode($authorfull);
-					}
+					} e
 					echo '<li><a href="'.html_encode($link).'">'.html_encode($title).'</a> <em>('.$date.')</em> <span class="author">'.$category.$authorlink.$comma.'</span></li>'."\n";
 				} 
 				echo '</ul></li></ul>';
