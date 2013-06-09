@@ -15,7 +15,7 @@
 
 $plugin_description = gettext('Simple plugin that provides a function to print an archive by title and month for albums and news articles. jQuery required for foldin/foldout.');
 $plugin_author = 'Malte Müller (acrylian)';
-$plugin_version = '1.4.4';
+$plugin_version = '1.0';
 $plugin_url = '';
 $option_interface = 'title_by_date_archive_options';
 
