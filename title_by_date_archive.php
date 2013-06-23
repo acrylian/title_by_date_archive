@@ -4,8 +4,8 @@
  *
  * Usage:
  * Add these calls to a theme page, e.g. a static custom theme page like archive.php of standard Zenphoto themes.
- * <?php printASTtitleByDateArchive('albums','asc'); ?>
- * <?php printASTtitleByDateArchive('news','asc'); ?>
+ * <?php printTitleByDateArchive('albums','asc'); ?>
+ * <?php printTitleByDateArchive('news','asc'); ?>
  * Both print a nested html list (<ul>)
  * 
  * @author Malte Müller (acrylian) 
