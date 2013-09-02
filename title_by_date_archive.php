@@ -222,7 +222,7 @@ function printTitleByDateArchive($type='albums',$order='asc') {
 					}
 					if(!empty($authorfull)) {
 						$authorlink = ' – '.html_encode($authorfull);
-					} e
+					} 
 					echo '<li><a href="'.html_encode($link).'">'.html_encode($title).'</a> <em>('.$date.')</em> <span class="author">'.$category.$authorlink.$comma.'</span></li>'."\n";
 				} 
 				echo '</ul></li></ul>';
