@@ -130,17 +130,17 @@ function printTitleByDateArchive($type='albums',$order='asc') {
 			$(function() {
 				$("ul.news li.notcurrent ul#<?php echo $type; ?>month<?php echo $year; ?>").toggle();   
 				$("ul.albums li.notcurrent ul#<?php echo $type; ?>month<?php echo $year; ?>").toggle();   
-			 	$("ul.news a.openyear<?php echo $type.$year; ?>").click(function() {
+			 	$("ul.news button.openyear<?php echo $type.$year; ?>").click(function() {
 					$("ul#newsmonth<?php echo $year; ?>").toggle();
 				}); 
-				$("ul.albums a.openyear<?php echo $type.$year; ?>").click(function() {
+				$("ul.albums button.openyear<?php echo $type.$year; ?>").click(function() {
 					$("ul#albumsmonth<?php echo $year; ?>").toggle();
 				}); 
 			}); 
 		// ]]> -->
 	 </script>
 	 <?php
-		echo '<ul class="archive'.$typeclass.'"><li class="year'.$currentyear.'"><a class="openyear'.$type.$year.'" href="#">'.$year.'</a>'."\n";
+		echo '<ul class="archive'.$typeclass.'"><li class="year'.$currentyear.'"><button class="openyear'.$type.$year.'" href="#">'.$year.'</button>'."\n";
 		foreach($months as $month) {
 			$result2 = '';
 			$monthonly = substr($month, 5, 7);
