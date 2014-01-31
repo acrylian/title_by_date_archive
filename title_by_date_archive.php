@@ -140,7 +140,7 @@ function printTitleByDateArchive($type='albums',$order='asc') {
 		// ]]> -->
 	 </script>
 	 <?php
-		echo '<ul class="archive'.$typeclass.'"><li class="year'.$currentyear.'"><button class="openyear'.$type.$year.'" href="#">'.$year.'</button>'."\n";
+		echo '<ul class="archive'.$typeclass.'"><li class="year'.$currentyear.'"><button type="button" class="openyear'.$type.$year.'" href="#">'.$year.'</button>'."\n";
 		foreach($months as $month) {
 			$result2 = '';
 			$monthonly = substr($month, 5, 7);
