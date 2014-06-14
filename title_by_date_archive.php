@@ -132,42 +132,55 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
     if ($count == 1) {
       $currentyear = ' currentyear';
     }
-    $typeclass = ' ' . $type;
+    if($type == 'toplevelalbums') {
+    	$typeclass = ' albums';
+    } else {
+    	$typeclass = ' ' . $type;
+    }
     ?>
     <script type="text/javascript">
     // <!-- <![CDATA[
       $(function() {
-        $("ul.news li.notcurrent ul#<?php echo $type; ?>month<?php echo $year; ?>").toggle();
-        $("ul.albums li.notcurrent ul#<?php echo $type; ?>month<?php echo $year; ?>").toggle();
-        $("ul.news button.openyear<?php echo $type . $year; ?>").click(function() {
+        $("ul.news li.notcurrent ul#<?php echo trim($typeclass); ?>month<?php echo $year; ?>").toggle();
+        $("ul.albums li.notcurrent ul#<?php echo trim($typeclass); ?>month<?php echo $year; ?>").toggle();
+        $("ul.news button.openyear<?php echo trim($typeclass) . $year; ?>").click(function() {
           $("ul#newsmonth<?php echo $year; ?>").toggle();
         });
-        $("ul.albums button.openyear<?php echo $type . $year; ?>").click(function() {
+        $("ul.albums button.openyear<?php echo trim($typeclass) . $year; ?>").click(function() {
           $("ul#albumsmonth<?php echo $year; ?>").toggle();
         });
       });
     // ]]> -->
     </script>
     <?php
-    echo '<ul class="archive' . $typeclass . '"><li class="year' . $currentyear . '"><button type="button" class="openyear' . $type . $year . '" href="#">' . $year . '</button>' . "\n";
+    echo '<ul class="archive' . $typeclass . '"><li class="year' . $currentyear . '"><button type="button" class="openyear' . trim($typeclass) . $year . '" href="#">' . $year . '</button>' . "\n";
     foreach ($months as $month) {
       $result2 = '';
       $monthonly = substr($month, 5, 7);
       if (substr($month, 0, 4) == $year) {
         $monthname = strftime('%Y-%B', strtotime($month));
         $monthname = substr($monthname, 5);
-        echo '<ul id="' . $type . 'month' . $year . '" class="' . $type . 'month"><li>' . $monthname . "\n";
+        echo '<ul id="' . trim($typeclass) . 'month' . $year . '" class="' . trim($typeclass) . 'month"><li>' . $monthname . "\n";
         //echo substr($month, 0, 4)."/".$year."<br />";
         // get the items by year and month
         switch ($type) {
           case 'albums':
           case 'toplevelalbums':
+          	switch($order) {
+          		case 'asc':
+          		default:
+          			$orderby = ' ORDER BY `date` ASC';
+          			break;
+          		case 'desc':
+          			$orderby = ' ORDER BY `date` DESC';
+          			break;
+          	}
             switch ($type) {
               case 'albums':
-                $sql = "SELECT `folder`, `date` FROM " . prefix('albums') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'";
+                $sql = "SELECT `folder`, `date` FROM " . prefix('albums') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'".$orderby;
                 break;
               case 'toplevelalbums':
-                $sql = "SELECT `folder`, `date` FROM " . prefix('albums') . " WHERE `show` = 1 AND `parentid` IS NULL AND `date` LIKE '" . $month . "%'";
+                $sql = "SELECT `folder`, `date` FROM " . prefix('albums') . " WHERE `show` = 1 AND `parentid` IS NULL AND `date` LIKE '" . $month . "%'".$orderby;
                 break;
             }
             if (!is_null($hidealbums)) {
@@ -179,7 +192,7 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
             $hint = $show = NULL;
             if ($result) {
               while ($item = db_fetch_assoc($result)) {
-                $obj = new Album(null, $item['folder']);
+                $obj = newAlbum($item['folder']);
                 if ($obj->checkAccess($hint, $show)) {
                   $result2[] = $obj;
                 }
@@ -219,7 +232,7 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
             case 'toplevelalbums':
               $title = $entry->getTitle();
               $date = zpFormattedDate(DATE_FORMAT, strtotime($entry->getDateTime()));
-              $link = $entry->getAlbumLink();
+              $link = $entry->getLink();
               if (getOption('title_by_date_archive_showalbumowner')) {
                 $author = $entry->getOwner();
                 $authorfull = getTitleByDateAuthorFullname($author);
