@@ -163,18 +163,19 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
         echo '<ul id="' . trim($typeclass) . 'month' . $year . '" class="' . trim($typeclass) . 'month"><li>' . $monthname . "\n";
         //echo substr($month, 0, 4)."/".$year."<br />";
         // get the items by year and month
+        switch($order) {
+        	case 'asc':
+          default:
+          	$orderby = ' ORDER BY `date` ASC';
+          	break;
+         	case 'desc':
+          	$orderby = ' ORDER BY `date` DESC';
+          	break;
+        }
         switch ($type) {
           case 'albums':
           case 'toplevelalbums':
-          	switch($order) {
-          		case 'asc':
-          		default:
-          			$orderby = ' ORDER BY `date` ASC';
-          			break;
-          		case 'desc':
-          			$orderby = ' ORDER BY `date` DESC';
-          			break;
-          	}
+          	
             switch ($type) {
               case 'albums':
                 $sql = "SELECT `folder`, `date` FROM " . prefix('albums') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'".$orderby;
@@ -201,7 +202,7 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
             }
             break;
           case 'news':
-            $sql = "SELECT `titlelink`, `date` FROM " . prefix('news') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'";
+            $sql = "SELECT `titlelink`, `date` FROM " . prefix('news') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'".$orderby;
             $result = query($sql);
             if ($result) {
               while ($item = db_fetch_assoc($result)) {
