@@ -8,13 +8,14 @@
  * <?php printTitleByDateArchive('news','asc'); ?>
  * Both print a nested html list (<ul>)
  * 
- * @author Malte Müller (acrylian) 
+ * @author Malte Müller (acrylian) <info@maltem.de>
+ * @license GPL v3 or later
  * @package plugins
  * @subpackage misc
  */
 $plugin_description = gettext('Simple plugin that provides a function to print an archive by title and month for albums and news articles. jQuery required for foldin/foldout.');
 $plugin_author = 'Malte Müller (acrylian)';
-$plugin_version = '1.0';
+$plugin_version = '1.0.1';
 $plugin_url = '';
 $option_interface = 'title_by_date_archive_options';
 
