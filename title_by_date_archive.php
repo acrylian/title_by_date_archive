@@ -9,6 +9,7 @@
  * Both print a nested html list (<ul>)
  * 
  * @author Malte Müller (acrylian) <info@maltem.de>
+ * @copyright 2014 Malte Müller
  * @license GPL v3 or later
  * @package plugins
  * @subpackage misc
