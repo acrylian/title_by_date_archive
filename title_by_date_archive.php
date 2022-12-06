@@ -16,7 +16,7 @@
  */
 $plugin_description = gettext('Simple plugin that provides a function to print an archive by title and month for albums and news articles. jQuery required for foldin/foldout.');
 $plugin_author = 'Malte Müller (acrylian)';
-$plugin_version = '1.0.1';
+$plugin_version = '1.1';
 $plugin_url = '';
 $option_interface = 'title_by_date_archive_options';
 
@@ -63,6 +63,7 @@ class title_by_date_archive_options {
  * @return array
  */
 function printTitleByDateArchive($type = 'albums', $order = 'asc') {
+	global $_zp_db;
   global $_zp_gallery, $_zp_zenpage;
 
   if ($type == 'news' && !getOption('zp_plugin_zenpage')) {
@@ -77,10 +78,10 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
     case 'toplevelalbums':
       switch ($type) {
         case 'albums':
-          $sql = "SELECT `date` FROM " . prefix('albums') . " WHERE `show` = 1";
+          $sql = "SELECT `date` FROM " . $_zp_db->prefix('albums') . " WHERE `show` = 1";
           break;
         case 'toplevelalbums':
-          $sql = "SELECT `date` FROM " . prefix('albums') . " WHERE `show` = 1 AND `parentid` IS NULL";
+          $sql = "SELECT `date` FROM " . $_zp_db->prefix('albums') . " WHERE `show` = 1 AND `parentid` IS NULL";
           break;
       }
       $hidealbums = getNotViewableAlbums();
@@ -90,7 +91,7 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
         }
         //$sql = substr($sql, 0, -5);
       }
-      $result = query_full_array($sql);
+      $result = $_zp_db->queryFullArray($sql);
       foreach ($result as $row) {
         $alldates[] = $row['date'];
       }
@@ -160,8 +161,9 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
       $result2 = '';
       $monthonly = substr($month, 5, 7);
       if (substr($month, 0, 4) == $year) {
-        $monthname = strftime('%Y-%B', strtotime($month));
-        $monthname = substr($monthname, 5);
+				$monthname = getFormattedLocaleDate('F', $month);
+        //$monthname = strftime('%Y-%B', strtotime($month));
+        //$monthname = substr($monthname, 5);
         echo '<ul id="' . trim($typeclass) . 'month' . $year . '" class="' . trim($typeclass) . 'month"><li>' . $monthname . "\n";
         //echo substr($month, 0, 4)."/".$year."<br />";
         // get the items by year and month
@@ -180,10 +182,10 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
           	
             switch ($type) {
               case 'albums':
-                $sql = "SELECT `folder`, `date` FROM " . prefix('albums') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'".$orderby;
+                $sql = "SELECT `folder`, `date` FROM " . $_zp_db->hprefix('albums') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'".$orderby;
                 break;
               case 'toplevelalbums':
-                $sql = "SELECT `folder`, `date` FROM " . prefix('albums') . " WHERE `show` = 1 AND `parentid` IS NULL AND `date` LIKE '" . $month . "%'".$orderby;
+                $sql = "SELECT `folder`, `date` FROM " . $_zp_db->prefix('albums') . " WHERE `show` = 1 AND `parentid` IS NULL AND `date` LIKE '" . $month . "%'".$orderby;
                 break;
             }
             if (!is_null($hidealbums)) {
@@ -191,10 +193,10 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
                 $sql .= ' AND `id` != ' . $id;
               }
             }
-            $result = query($sql);
+            $result = $_zp_db->query($sql);
             $hint = $show = NULL;
             if ($result) {
-              while ($item = db_fetch_assoc($result)) {
+              while ($item = $_zp_db->fetchAssoc($result)) {
                 $obj = newAlbum($item['folder']);
                 if ($obj->checkAccess($hint, $show)) {
                   $result2[] = $obj;
@@ -204,16 +206,16 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
             }
             break;
           case 'news':
-            $sql = "SELECT `titlelink`, `date` FROM " . prefix('news') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'".$orderby;
-            $result = query($sql);
+            $sql = "SELECT `titlelink`, `date` FROM " . $_zp_db->prefix('news') . " WHERE `show` = 1 AND `date` LIKE '" . $month . "%'".$orderby;
+            $result = $_zp_db->query($sql);
             if ($result) {
-              while ($item = db_fetch_assoc($result)) {
+              while ($item = $_zp_db->fetchAssoc($result)) {
                 $obj = new ZenpageNews($item['titlelink']);
                 if ($obj->categoryIsVisible()) {
                   $result2[] = $obj;
                 }
               }
-              db_free_result($result);
+              $_zp_db->freeResult($result);
             }
             break;
         }
@@ -246,7 +248,7 @@ function printTitleByDateArchive($type = 'albums', $order = 'asc') {
               // news are already objects here!
               $title = $entry->getTitle();
               $date = zpFormattedDate(DATE_FORMAT, strtotime($entry->getDateTime()));
-              $link = getNewsURL($entry->getTitleLink());
+              $link = getNewsURL($entry->getName());
               if (getOption('title_by_date_archive_shownewsauthor')) {
                 $author = $entry->getAuthor();
                 $authorfull = getTitleByDateAuthorFullname($author);
@@ -313,4 +315,3 @@ function getTitleByDateAuthorFullname($author) {
   }
   return $authorfull;
 }
-?>
